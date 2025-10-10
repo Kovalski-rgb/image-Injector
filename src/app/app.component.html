@@ -9,7 +9,7 @@
 </form>
 
 <div class="rangeInput">
-  <label for="rangeSelector">Using {{bitesPerChannel}} bit{{bitesPerChannel>1?"s":""}} per channel!</label>
+  <label for="rangeSelector">Using {{bitesPerChannel}} bite{{bitesPerChannel>1?"s":""}} per channel!</label>
   <input id="rangeSelector" type="range" [ngModel]="bitesPerChannel" (ngModelChange)="updateSlider($event)" min="1" max="8">
 </div>
 

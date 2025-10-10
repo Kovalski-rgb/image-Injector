@@ -19,7 +19,6 @@ export class AppComponent implements OnInit {
   @ViewChild("fileInput") fileInput: ElementRef<HTMLInputElement>;
   @ViewChild("imgInput") imgInput: ElementRef<HTMLInputElement>;
 
-  readonly HEADER_OFFSET_BPC_IN_BITS = 4;
   readonly DEFAULT_BITES_PER_CHANNEL = 2;
   readonly DEFAULT_HEADER_SIZE_IN_BITS = 320;
   readonly TOTAL_COLOR_CHANNELS = 3;
@@ -96,6 +95,8 @@ export class AppComponent implements OnInit {
         size: file.size,
         type: file.type
       }
+      console.log(this.fileMetadata);
+      
       this.fileContents = event?.target?.result as ArrayBuffer;
     }
     reader.readAsArrayBuffer(file);
@@ -155,25 +156,14 @@ export class AppComponent implements OnInit {
     a.remove();
   }
 
+  // TODO: inject and auto detect bits per channel used
   protected extractDataFromImage(): string {
     const ctx = this.canvas.nativeElement.getContext("2d");
     let extractedData = "";
 
     const imgData = ctx?.getImageData(0, 0, this.canvasW, this.canvasH) as ImageData;
     const data = imgData.data;
-
-    let bpc = "";
-      bpc += 
-        data[0].toString(2).padStart(8,"0").substring(7)
-      + data[1].toString(2).padStart(8,"0").substring(7)
-      + data[2].toString(2).padStart(8,"0").substring(7)
-      + data[3].toString(2).padStart(8,"0").substring(7);
-    this.bitesPerChannel = parseInt(bpc, 2);
-    if(this.bitesPerChannel>8 || this.bitesPerChannel<1) {
-      alert("Corrupted image");
-      throw "Corrupted image";
-    }
-    for(let i = this.HEADER_OFFSET_BPC_IN_BITS; i < data.length; i += 4) {
+    for(let i = 0; i < data.length; i += 4) {
       // red channel
       extractedData += data[i].toString(2).padStart(8, '0').substring(8-this.bitesPerChannel);
       // green channel
@@ -185,10 +175,10 @@ export class AppComponent implements OnInit {
     }
     let header;
     try {
-      header = JSON.parse(this.binToHeader("0000"+extractedData.substring(this.HEADER_OFFSET_BPC_IN_BITS, this.DEFAULT_HEADER_SIZE_IN_BITS)));
+      header = JSON.parse(this.binToHeader(extractedData.substring(0, this.DEFAULT_HEADER_SIZE_IN_BITS)));
     } catch (e) {
-      alert("Corrupted image");
-      throw "Corrupted image";
+      alert("Corrupted image, or the number of bits per channel is not the same as when the image was generated");
+      throw "Corrupted image, or the number of bits per channel is not the same as when the image was generated";
     }
     this.binToFile(extractedData.substring(this.DEFAULT_HEADER_SIZE_IN_BITS, this.DEFAULT_HEADER_SIZE_IN_BITS+(header.size*8)), header.type);
     return extractedData;
@@ -200,10 +190,7 @@ export class AppComponent implements OnInit {
     for(let char of metadata) {  
       bin+=(char.charCodeAt(0).toString(2).padStart(8, "0"));
     }
-    bin = bin.padStart(this.DEFAULT_HEADER_SIZE_IN_BITS-this.HEADER_OFFSET_BPC_IN_BITS, "0");
-    bin = this.bitesPerChannel.toString(2).padStart(this.HEADER_OFFSET_BPC_IN_BITS, "0") + bin;
-    console.log(bin);
-    return bin;
+    return bin.padStart(this.DEFAULT_HEADER_SIZE_IN_BITS, "0");
   }
 
   protected binToHeader(header: string): string {
@@ -232,11 +219,7 @@ export class AppComponent implements OnInit {
     bin = this.headerToBin(this.fileMetadata)+bin;
 
     let binBlockCounter = 0;
-    newImg.data[0] = parseInt(bin.charAt(0),2);
-    newImg.data[1] = parseInt(bin.charAt(1),2);
-    newImg.data[2] = parseInt(bin.charAt(2),2);
-    newImg.data[3] = parseInt(bin.charAt(3).padStart(8,"1"),2);
-    for(let channelIndex = 4; channelIndex < data.length; channelIndex+=4) {
+    for(let channelIndex = 0; channelIndex < data.length; channelIndex+=4) {
       let binData = defaultFiller;
       if(bin.length > binBlockCounter) {
         binData = bin.substring(binBlockCounter, binBlockCounter+binBlockSize).padEnd(binBlockSize, "0");
