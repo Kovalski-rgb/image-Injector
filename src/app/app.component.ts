@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   @ViewChild("imgInput") imgInput: ElementRef<HTMLInputElement>;
 
   readonly DEFAULT_BITES_PER_CHANNEL = 2;
-  readonly DEFAULT_HEADER_SIZE_IN_BITS = 320;
+  readonly DEFAULT_HEADER_SIZE_IN_BITS = 640;
   readonly TOTAL_COLOR_CHANNELS = 3;
 
   protected linkForm: FormGroup;
