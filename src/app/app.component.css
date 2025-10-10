@@ -1,0 +1,27 @@
+.rangeInput {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    margin-top: 16px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollableCanvas {
+    overflow: auto;
+    width: 98vw;
+    height: 90vh;
+}
+
+.error {
+    color: red;
+    font-weight: 800;
+}
+
+.success {
+    color: green;
+    font-weight: 800;
+}
