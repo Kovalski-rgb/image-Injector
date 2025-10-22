@@ -10,6 +10,14 @@
     flex-direction: column;
 }
 
+.password-field {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    gap: 8px;
+}
+
 .scrollableCanvas {
     overflow: auto;
     width: 98vw;
@@ -24,4 +32,19 @@
 .success {
     color: green;
     font-weight: 800;
+}
+
+.pass {
+    color: darkslateblue;
+    font-weight: 800;
+}
+
+.appStatus {
+    color: blueviolet;
+    font-weight: 800;
+}
+
+.invalid {
+  background-color: ivory;
+  outline: 1px solid red;
 }

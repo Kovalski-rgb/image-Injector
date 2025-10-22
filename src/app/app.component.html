@@ -8,18 +8,32 @@
   <button type="submit">Upload file</button>
 </form>
 
+<form [formGroup]="passwordForm" class="password-field" (submit)="setPassword()">
+  <input id="pass" formControlName="password" type="password" placeholder="Type the password">
+  <input [ngClass]="confirmPasswordField?.valid?'':'invalid'" id="confirmPass" formControlName="confirmPassword" type="password" placeholder="Confirm the password">
+</form>
+
 <div class="rangeInput">
-  <label for="rangeSelector">Using {{bitesPerChannel}} bite{{bitesPerChannel>1?"s":""}} per channel!</label>
-  <input id="rangeSelector" type="range" [ngModel]="bitesPerChannel" (ngModelChange)="updateSlider($event)" min="1" max="8">
+  <label for="rangeSelector">Using {{bitsPerChannel}} bit{{bitsPerChannel>1?"s":""}} per channel!</label>
+  <input id="rangeSelector" type="range" [ngModel]="bitsPerChannel" (ngModelChange)="updateSlider($event)" min="1" max="8">
 </div>
 
 <p *ngIf="isImgLoaded">Size: [{{canvasW}}x{{canvasH}}]</p>
 <p *ngIf="isImgLoaded">{{parseSize(imgAvailableBytes)}} available</p>
 <p *ngIf="isFileLoaded">The loaded file will occupy {{parseSize(fileMetadata.size)}}</p>
 <div *ngIf="isFileLoaded && isImgLoaded">
+  <p *ngIf="passwordForm.valid" class="pass">Using a password for cryptography (it will significally increase the time that is takes to inject and extract a image)</p>
   <p *ngIf="imgAvailableBytes >= fileMetadata.size" class="success">You can Inject the file into the image!</p>
   <p *ngIf="imgAvailableBytes < fileMetadata.size" class="error">The file is bigger than your image</p>
 </div>
+
+<div *ngIf="currentErrorStatus !== ''" class="">
+  <hr>
+  <p class="error">{{currentErrorStatus}}</p>
+  <hr>
+</div>
+
+<p class="appStatus">{{currentStatus}}</p>
 
 <div class="column">
   <div>
@@ -31,3 +45,4 @@
     <canvas #previewCanvas  [attr.width]="canvasW" [attr.height]="canvasH"></canvas>
   </div>
 </div>
+
