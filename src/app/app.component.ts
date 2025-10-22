@@ -38,9 +38,7 @@ export class AppComponent implements OnInit {
   protected imgAvailableBytes = 0;
 
   protected errorTimeout: any;
-  protected statusTimeout: any;
   protected currentErrorStatus = "";
-  protected currentStatus = "";
 
   protected fileMetadata = {
     type: "",
@@ -220,7 +218,6 @@ export class AppComponent implements OnInit {
         binHeader =  await this.encryptBin(binHeader);
       }
       const strHeader = this.binToString(binHeader);
-      console.log(strHeader)
       header = JSON.parse(strHeader);
     } catch (e) {
       this.currentErrorStatus = "Corrupted image header, wrong password or this image does not contain anything.";
@@ -307,11 +304,7 @@ export class AppComponent implements OnInit {
     ctx?.putImageData(newImg, 0, 0);
     this.bitsPerChannel = oldBitsPerChannel;
 
-    this.currentStatus = "File injected successfully!";
-    clearTimeout(this.statusTimeout);
-    this.statusTimeout = setTimeout(() => {
-      this.currentStatus = "";
-    }, this.MESSAGE_TIMEOUT);
+    alert("File injected successfully!");
   }
 
   protected async encryptBin(bin: string): Promise<string> {
