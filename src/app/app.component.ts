@@ -281,10 +281,10 @@ export class AppComponent implements OnInit {
     const headerOffset = this.RESERVED_PIXELS_BEFORE_HEADER*this.CHANNELS_PER_PIXEL;
     const bpc = this.bitsPerChannel.toString(2).padStart(headerOffset, '0');
     for(let i = 0; i < headerOffset; i++) {
-      if(i%3===0) {
+      if(i > 0 && i%3===0) {
         newImg.data[i] = parseInt(bpc.charAt(i).padStart(8, "1"), 2);
       } else {
-        newImg.data[i] = parseInt(bpc.charAt(i), 2);
+        newImg.data[i] = parseInt(data[i].toString(2).padStart(8, '0').substring(0, 7) + bpc.charAt(i), 2);
       }
     }
 
