@@ -1,6 +1,8 @@
 
 export class CryptoUtils {
 
+  public readonly TOTAL_HASH_RERUNS = 5000;
+
   public async getHash(data: string): Promise<ArrayBuffer> {
     const encodedData = new TextEncoder().encode(data);
     return await window.crypto.subtle.digest("SHA-512", encodedData);
@@ -15,6 +17,7 @@ export class CryptoUtils {
 
   public async encode(data: string, password: string) {
     let hash = await this.getBinHash(password);
+    for(let i = 0; i < this.TOTAL_HASH_RERUNS; i++) hash = await this.getBinHash(hash);
     let aux = "";
     for(let i = 0; i < data.length; i++) {
       const dataBlock = data.charAt(i)

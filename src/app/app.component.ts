@@ -217,7 +217,7 @@ export class AppComponent implements OnInit {
     try {
       let binHeader = extractedData.substring(0, this.DEFAULT_HEADER_SIZE_IN_BITS);
       if(this.passwordForm.valid) {
-        binHeader =  await this.encryptBin(binHeader);
+        binHeader =  await this.encryptBin(binHeader, "header");
       }
       const strHeader = this.binToString(binHeader);
       header = JSON.parse(strHeader);
@@ -231,7 +231,7 @@ export class AppComponent implements OnInit {
     }
     let binExtractedData = extractedData.substring(this.DEFAULT_HEADER_SIZE_IN_BITS, this.DEFAULT_HEADER_SIZE_IN_BITS + (header.size * 8));
     if(this.passwordForm.valid) {
-      binExtractedData = await this.encryptBin(binExtractedData);
+      binExtractedData = await this.encryptBin(binExtractedData, "bin");
     }
     this.binToFile(binExtractedData, header.type);
   }
@@ -273,7 +273,7 @@ export class AppComponent implements OnInit {
 
     const header = this.headerToBin(this.fileMetadata);
     if(this.passwordForm.valid) {
-      bin = await this.encryptBin(header) + await this.encryptBin(bin);
+      bin = await this.encryptBin(header, "header") + await this.encryptBin(bin, "bin");
     } else {
       bin = header + bin;
     }
@@ -309,11 +309,16 @@ export class AppComponent implements OnInit {
     alert("File injected successfully!");
   }
 
-  protected async encryptBin(bin: string): Promise<string> {
+  /**
+   * XORs the bin with a pseudo-random generated key based on the password with the same length as the payload 
+   * @param bin the payload
+   * @param passSalt optional "salt", not truly salt, but it changes the resulting hash for both headers and the payload
+   */
+  protected async encryptBin(bin: string, passSalt: string = ""): Promise<string> {
     const aux = new CryptoUtils();
     const pass = this.passwordForm.get("password");
     if(!pass) return bin;
-    return await aux.encode(bin, pass.value);
+    return await aux.encode(bin, pass.value + passSalt);
   }
 
   protected handlePaste(fieldType: "img"|"file", event: ClipboardEvent) {
