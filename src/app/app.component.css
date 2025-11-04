@@ -48,3 +48,17 @@
   background-color: ivory;
   outline: 1px solid red;
 }
+
+.paste-field {
+    padding: 12px;
+    min-width: 280px;
+    max-width: 520px;
+    border: 1px;
+    border-style: solid;
+    border-radius: 0px 8px 8px 0px;
+    border-color: lightgray;
+}
+
+.paste-field:focus {
+    border-color: black;
+}

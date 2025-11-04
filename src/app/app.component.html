@@ -1,13 +1,14 @@
-<form [formGroup]="linkForm" (submit)="updateImgLink()">
-  <input #imgInput type="file">
-  <button type="submit">Upload/Reset image</button>
-</form>
+<div>
+  <form tabindex="0" (paste)="handlePaste('img', $event)" class="paste-field" [formGroup]="linkForm" (submit)="updateImgLink()">
+    <input #imgInput type="file">
+    <button type="submit">Upload/Reset image</button>
+  </form>
 
-<form [formGroup]="fileForm" (submit)="handleFile()">
-  <input #fileInput type="file">
-  <button type="submit">Upload file</button>
-</form>
-
+  <form tabindex="0" (paste)="handlePaste('file', $event)" class="paste-field" [formGroup]="fileForm" (submit)="handleFile()">
+    <input #fileInput type="file">
+    <button type="submit">Upload file</button>
+  </form>
+</div>
 <form [formGroup]="passwordForm" class="password-field" (submit)="setPassword()">
   <input id="pass" formControlName="password" type="password" placeholder="Type the password">
   <input [ngClass]="confirmPasswordField?.valid?'':'invalid'" id="confirmPass" formControlName="confirmPassword" type="password" placeholder="Confirm the password">
@@ -38,6 +39,7 @@
     <button *ngIf="isImgLoaded" (click)="extractDataFromImage()">Extract data from image!</button>
     <button *ngIf="isFileLoaded && isImgLoaded &&imgAvailableBytes >= fileMetadata.size" (click)="injectFIleIntoImage()">Inject file into image!</button>
     <button *ngIf="isImgLoaded" (click)="downloadCurrentCanvas()">Download image!</button>
+    <button *ngIf="isImgLoaded" (click)="copyCurrentCanvasToClipboard()">Copy canvas to clipboard!</button>
   </div>
   <div class="scrollableCanvas">
     <canvas #previewCanvas  [attr.width]="canvasW" [attr.height]="canvasH"></canvas>

@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
   readonly RESERVED_PIXELS_BEFORE_HEADER = 1;
   readonly CHANNELS_PER_PIXEL = 4;
   readonly DEFAULT_BITES_PER_CHANNEL = 2;
-  readonly DEFAULT_HEADER_SIZE_IN_BITS = 320;
+  readonly DEFAULT_HEADER_SIZE_IN_BITS = 640;
   readonly TOTAL_COLOR_CHANNELS = 3;
   readonly MAX_FILE_NAME = 10;
   readonly MESSAGE_TIMEOUT = 3500;
@@ -97,7 +97,9 @@ export class AppComponent implements OnInit {
         const bitmap = await createImageBitmap(img);
         this.canvasH = img.height;
         this.canvasW = img.width;
-        this.imgAvailableBytes = (this.canvasH * this.canvasW * this.TOTAL_COLOR_CHANNELS * this.bitsPerChannel) / 8;
+        this.imgAvailableBytes = ( 
+          ((this.canvasH * this.canvasW * this.TOTAL_COLOR_CHANNELS * this.bitsPerChannel) -
+           this.RESERVED_PIXELS_BEFORE_HEADER*this.TOTAL_COLOR_CHANNELS) / 8 ) - this.DEFAULT_HEADER_SIZE_IN_BITS / 8;
         this.isImgLoaded = true;
         setTimeout(() => {
           this.canvas.nativeElement.getContext("2d", { willReadFrequently: true })?.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
@@ -132,13 +134,13 @@ export class AppComponent implements OnInit {
 
   protected parseSize(size: number): string {
     if (size > 1000000000) {
-      return `${Math.round((size / 1000000000) * 10) / 10} GB`;
+      return `${Math.round((size / 1000000000) * 100) / 100} GB`;
     }
     if (size > 1000000) {
-      return `${Math.round((size / 1000000) * 10) / 10} MB`;
+      return `${Math.round((size / 1000000) * 100) / 100} MB`;
     }
     if (size > 1000) {
-      return `${Math.round((size / 1000) * 10) / 10} KB`;
+      return `${Math.round((size / 1000) * 100) / 100} KB`;
     }
     return `${size} bytes`;
   }
@@ -312,6 +314,27 @@ export class AppComponent implements OnInit {
     const pass = this.passwordForm.get("password");
     if(!pass) return bin;
     return await aux.encode(bin, pass.value);
+  }
+
+  protected handlePaste(fieldType: "img"|"file", event: ClipboardEvent) {
+    if(!event || !event.clipboardData) return;
+    if(fieldType === "img") {
+      this.imgInput.nativeElement.files = event.clipboardData.files;
+      this.updateImgLink();
+    } else {
+      this.fileInput.nativeElement.files = event.clipboardData.files;
+      this.handleFile();
+    }
+  }
+
+  protected copyCurrentCanvasToClipboard() {
+    this.canvas.nativeElement.toBlob(
+      (blob => {
+        if(!blob) return;
+        const img = new ClipboardItem({"image/png": blob});
+        navigator.clipboard.write([img]);
+      }), "image/png", 1
+    )
   }
 
 }
