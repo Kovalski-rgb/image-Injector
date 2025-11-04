@@ -2,13 +2,9 @@
   "name": "img-injector",
   "version": "1.0.0",
   "scripts": {
-    "ng": "ng",
     "start": "ng serve",
     "build": "ng build --base-href \"./\"",
-    "deploy": "ngh --dir dist/browser",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "build:ghPages": "ng build --base-href /"
+    "deploy": "ngh --dir dist/browser"
   },
   "private": true,
   "dependencies": {
